@@ -20,7 +20,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
           email: "develop@nbn23.com";
       };
   };
-  host: "store-manager.nbn23.app";
+  host: "gcr-store-manager-kgju3lmrya-ew.a.run.app";
   schemes: HTTPS;
   consumes: "application/json";
   produces: "application/json";
@@ -49,10 +49,27 @@ enum SubscriptionType {
   SUBSCRIPTION_TYPE_UNSPECIFIED = 0;
   // SUBSCRIPTION_TYPE_TRIAL represents a trial subscription.
   SUBSCRIPTION_TYPE_TRIAL= 1;
-  // SUBSCRIPTION_TYPE_TRIAL represents a premium subscription.
+  // SUBSCRIPTION_TYPE_PREMIUM represents a premium subscription.
   SUBSCRIPTION_TYPE_PREMIUM = 2;
-  // SUBSCRIPTION_TYPE_PREMIUM represents a manual premium subscription.
+  // SUBSCRIPTION_TYPE_MANUAL_PREMIUM represents a manual premium subscription.
   SUBSCRIPTION_TYPE_MANUAL_PREMIUM = 3;
+  // SUBSCRIPTION_TYPE_FREE represents a user with no subscription.
+  SUBSCRIPTION_TYPE_FREE = 4;
+}
+
+// SubscriptionCode 
+//
+// SubscriptionCode represents the code of the subscription.
+enum SubscriptionCode {
+  SUBSCRIPTION_CODE_UNSPECIFIED = 0;
+  // SUBSCRIPTION_CODE_STARTED represents that a subscription has started.
+  SUBSCRIPTION_CODE_STARTED= 1;
+  // SUBSCRIPTION_CODE_RENEWED represents that a subscription has been renewed.
+  SUBSCRIPTION_CODE_RENEWED = 2;
+  // SUBSCRIPTION_CODE_CANCELLED represents that a subscription has been cancelled.
+  SUBSCRIPTION_CODE_CANCELLED = 3;
+  // SUBSCRIPTION_CODE_EXPIRED represents that a subscription has expired.
+  SUBSCRIPTION_CODE_EXPIRED = 4;
 }
 
 // SubscriptionProvider
@@ -68,6 +85,33 @@ enum SubscriptionProvider {
   SUBSCRIPTION_PROVIDER_STRIPE = 3;
   // SUBSCRIPTION_PROVIDER_REDSYS represents a subscription purchased through Redsys.
   SUBSCRIPTION_PROVIDER_REDSYS = 4;  
+}
+
+// SubscriptionCategory
+//
+// SubscriptionCategory represents the category of the subscription.
+enum SubscriptionCategory {
+  SUBSCRIPTION_CATEGORY_UNSPECIFIED = 0;
+  // SUBSCRIPTION_CATEGORY_GIFT represents a subscription purchased as a gift.
+  SUBSCRIPTION_CATEGORY_GIFT = 1;
+  // SUBSCRIPTION_CATEGORY_GROUP represents a subscription purchased as a group.
+  SUBSCRIPTION_CATEGORY_GROUP = 2; 
+}
+
+// SubscriptionPayload
+//
+// SubscriptionPayload represents the payload of a subscription.
+message SubscriptionPayload {
+  // product_id is the unique identifier of the product.
+  string product_id = 1 [(buf.validate.field).string = {min_len: 3, max_len: 32}];
+  // purchase_token is the purchase token of the subscription.
+  string purchase_token = 2 [(buf.validate.field).string = {min_len: 3, max_bytes: 7168}];
+  // provider is the provider of the subscription.
+  SubscriptionProvider provider = 3 [(buf.validate.field).enum = {not_in: [0]}];
+  // purchased_at is the time when the subscription was purchased.
+  google.protobuf.Timestamp purchased_at = 4 [(buf.validate.field).timestamp.gte.seconds = 0];
+  // expires_at is the time when the subscription expires.
+  google.protobuf.Timestamp expires_at = 5 [(buf.validate.field).timestamp.gte.seconds = 0];
 }
 
 // ProductPayload
@@ -92,20 +136,34 @@ message Subscription {
   string user_id = 1 [(buf.validate.field).string = {min_len: 3, max_len: 32}];
   // app_id is the unique identifier of the application.
   string app_id = 2 [(buf.validate.field).string = {min_len: 3, max_len: 32}];
-  // product_id is the unique identifier of the product.
-  string product_id = 3 [(buf.validate.field).string = {min_len: 3, max_len: 32}];
-  // purchase_token is the purchase token of the subscription.
-  string purchase_token = 4 [(buf.validate.field).string = {min_len: 3, max_bytes: 7168}];
   // type is the type of the subscription.
-  SubscriptionType type = 5 [(buf.validate.field).enum = {not_in: [0]}];
-  // provider is the provider of the subscription.
-  SubscriptionProvider provider = 6 [(buf.validate.field).enum = {not_in: [0]}];
-  // purchased_at is the time when the subscription was purchased.
-  google.protobuf.Timestamp purchased_at = 7 [(buf.validate.field).timestamp.gte.seconds = 0];
-  // expires_at is the time when the subscription expires.
-  google.protobuf.Timestamp expires_at = 8 [(buf.validate.field).timestamp.gte.seconds = 0];
+  SubscriptionType type = 3 [(buf.validate.field).enum = {not_in: [0]}];
+  // code is the code of the subscription.
+  optional SubscriptionCode code = 4 [(buf.validate.field).enum = {not_in: [0]}];  
+  // category is the category of the subscription.
+  optional SubscriptionCategory category = 5 [(buf.validate.field).enum = {not_in: [0]}];  
+  // subscription_payload is the payload of the subscription.
+  optional SubscriptionPayload subscription_payload = 6 [(buf.validate.field) = {required: false}];
   // product_payload is the payload of the product.
-  optional ProductPayload product_payload = 9 [(buf.validate.field) = {required: false}];
+  optional ProductPayload product_payload = 7 [(buf.validate.field) = {required: false}];
+}
+
+// PrivacyPolicy
+//
+// PrivacyPolicy represents a privacy policy accepted by the user.
+message PrivacyPolicy {
+  // version is the version of the privacy policy.
+  string version = 1 [(buf.validate.field).string = {min_len: 1, max_len: 3}];
+  // policy_date is the date when the privacy policy was created.
+  google.protobuf.Timestamp policy_date = 2 [(buf.validate.field).timestamp.gte.seconds = 0];  
+  // accepted_date is the date when the privacy policy was accepted.
+  google.protobuf.Timestamp accepted_date = 3 [(buf.validate.field).timestamp.gte.seconds = 0];
+  // business_communications is the acceptance of business communications.
+  bool business_communications = 4;
+  // marketing_segmentation is the acceptance of marketing segmentation.
+  bool marketing_segmentation = 5;
+  // data_transfer is the acceptance of data transfer.
+  bool data_transfer = 6;
 }
 
 // User
@@ -120,36 +178,94 @@ message User {
   optional string name = 3 [(buf.validate.field).string = {min_len: 3, max_len: 32}];
   // image is the image URL of the user.
   optional string image = 4 [(buf.validate.field).string = {min_len: 3, max_len: 32}];
+  // privacy_policies is the list of privacy policies accepted by the user.
+  repeated PrivacyPolicy privacy_policies = 5;
 }
 
-// GetUserRequest
+// CreateUserRequest
 //
-// GetUserRequest represents a request to get a user.
-message GetUserRequest {
+// CreateUserRequest represents a request to create a user.
+message CreateUserRequest {
   // user_id is the unique identifier of the user.
   string user_id = 1 [(buf.validate.field).string = {min_len: 3, max_len: 32}];
+  // app_id is the unique identifier of the application.
+  string app_id = 2 [(buf.validate.field).string = {min_len: 3, max_len: 32}]; 
+  // email is the email of the user.
+  string email = 3 [(buf.validate.field).string.email = true];
+  // name is the name of the user.
+  optional string name = 4 [(buf.validate.field).string = {min_len: 3, max_len: 32}];
+  // image is the image URL of the user.
+  optional string image = 5 [(buf.validate.field).string = {min_len: 3, max_len: 32}];
 }
 
-// GetSubscriptionRequest
+// ReadUserRequest
 //
-// GetSubscriptionRequest represents a request to get a subscription.
-message GetSubscriptionRequest {
+// ReadUserRequest represents a request to get a user.
+message ReadUserRequest {
+  // user_id is the unique identifier of the user.
+  string user_id = 1 [(buf.validate.field).string = {min_len: 3, max_len: 32}];
+  // app_id is the unique identifier of the application.
+  string app_id = 2 [(buf.validate.field).string = {min_len: 3, max_len: 32}];  
+}
+
+// ReadUserByEmailRequest
+//
+// ReadUserByEmailRequest represents a request to get a user by email.
+message ReadUserByEmailRequest {
+  // email is the email of the user.
+  string email = 1 [(buf.validate.field).string.email = true];
+  // app_id is the unique identifier of the application.
+  string app_id = 2 [(buf.validate.field).string = {min_len: 3, max_len: 32}];  
+}
+
+// UpdateUserRequest
+//
+// UpdateUserRequest represents a request to update a user.
+message UpdateUserRequest {
+  // user_id is the unique identifier of the user.
+  string user_id = 1 [(buf.validate.field).string = {min_len: 3, max_len: 32}];
+  // app_id is the unique identifier of the application.
+  string app_id = 2 [(buf.validate.field).string = {min_len: 3, max_len: 32}]; 
+  // name is the name of the user.
+  optional string name = 4 [(buf.validate.field).string = {min_len: 3, max_len: 32}];
+  // image is the image URL of the user.
+  optional string image = 5 [(buf.validate.field).string = {min_len: 3, max_len: 32}];
+}
+
+// DeleteUserRequest
+//
+// DeleteUserRequest represents a request to delete a user.
+message DeleteUserRequest {
+  // user_id is the unique identifier of the user.
+  string user_id = 1 [(buf.validate.field).string = {min_len: 3, max_len: 32}];
+  // app_id is the unique identifier of the application.
+  string app_id = 2 [(buf.validate.field).string = {min_len: 3, max_len: 32}]; 
+}
+
+// UpsertPrivacyPolicyRequest
+//
+// UpsertPrivacyPolicyRequest represents a request to create or update the privacy policy of a user.
+message UpsertPrivacyPolicyRequest {
   // user_id is the unique identifier of the user.
   string user_id = 1 [(buf.validate.field).string = {min_len: 3, max_len: 32}];
   // app_id is the unique identifier of the application.
   string app_id = 2 [(buf.validate.field).string = {min_len: 3, max_len: 32}];
+  // business_communications is the acceptance of business communications.
+  bool business_communications = 3;
+  // marketing_segmentation is the acceptance of marketing segmentation.
+  bool marketing_segmentation = 4;
+  // data_transfer is the acceptance of data transfer.
+  bool data_transfer = 5;
 }
 
-// UpsertUserRequest
+// ReadSubscriptionRequest
 //
-// UpsertUserRequest represents a request to create or update a user.
-message UpsertUserRequest {
-  // email is the email of the user.
-  string email = 2 [(buf.validate.field).string.email = true];
-  // name is the name of the user.
-  optional string name = 3 [(buf.validate.field).string = {min_len: 3, max_len: 32}];
-  // image is the image URL of the user.
-  optional string image = 4 [(buf.validate.field).string = {min_len: 3, max_len: 32}];
+// ReadSubscriptionRequest represents a request to get a subscription.
+message ReadSubscriptionRequest {
+  // user_id is the unique identifier of the user.
+  string user_id = 1 [(buf.validate.field).string = {min_len: 3, max_len: 32}];
+  // app_id is the unique identifier of the application.
+  string app_id = 2 [(buf.validate.field).string = {min_len: 3, max_len: 32}];
 }
 
 // AddMemberRequest
@@ -176,26 +292,58 @@ message RemoveMemberRequest {
   string recipient = 4 [(buf.validate.field).string.email = true];
 }
 
-// GetUserResponse
+// CreateUserResponse
 //
-// GetUserResponse represents a response to get a user.
-message GetUserResponse {
+// CreateUserResponse represents a response to create a user.
+message CreateUserResponse {
+  // success is the success of the operation.
+  bool success = 1;
+}
+
+// ReadUserResponse
+//
+// ReadUserResponse represents a response to get a user.
+message ReadUserResponse {
   // user is the user.
   User user = 1;
 }
 
-// UpsertUserResponse
+// ReadUserByEmailResponse
 //
-// UpsertUserResponse represents a response to create or update a user.
-message UpsertUserResponse {
+// ReadUserByEmailResponse represents a response to get a user by email.
+message ReadUserByEmailResponse {
   // user is the user.
   User user = 1;
 }
 
-// GetSubscriptionResponse
+// UpdateUserResponse
 //
-// GetSubscriptionResponse represents a response to get a subscription.
-message GetSubscriptionResponse {
+// UpdateUserResponse represents a response to update a user.
+message UpdateUserResponse {
+  // success is the success of the operation.
+  bool success = 1;
+}
+
+// DeleteUserResponse
+//
+// DeleteUserResponse represents a response to update a user.
+message DeleteUserResponse {
+  // success is the success of the operation.
+  bool success = 1;
+}
+
+// UpsertPrivacyPolicyResponse
+//
+// UpsertPrivacyPolicyResponse represents a response to create or update the privacy policy of a user.
+message UpsertPrivacyPolicyResponse {
+  // success is the success of the operation.
+  bool success = 1;
+}
+
+// ReadSubscriptionResponse
+//
+// ReadSubscriptionResponse represents a response to get a subscription.
+message ReadSubscriptionResponse {
   // subscription is the subscription.
   Subscription subscription = 1;
 }
@@ -216,35 +364,73 @@ message RemoveMemberResponse {
   bool success = 1;
 }
 
-// PayService
+// StoreService
 //
-// PayService represents the service to handle user payments.
-service PayService {
-  // GetUser
+// StoreService represents the service to manage the store.
+service StoreService {
+  // CreateUser
   //
-  // GetUser returns the user with the given id.
-  rpc GetUser (GetUserRequest) returns (GetUserResponse) {
+  // CreateUser creates a new user.
+  rpc CreateUser (CreateUserRequest) returns (CreateUserResponse) {
     option (google.api.http) = {
-      get: "/v1/users/{user_id}"
+      put: "/v1/users/{user_id}/apps/{app_id}"
+      body: "*"
     };
   }
 
-  // GetSubscription
+  // ReadUser
   //
-  // GetSubscription returns the subscription with the given id.
-  rpc GetSubscription (GetSubscriptionRequest) returns (GetSubscriptionResponse) {
+  // ReadUser returns the user with the given id.
+  rpc ReadUser (ReadUserRequest) returns (ReadUserResponse) {
+    option (google.api.http) = {
+      get: "/v1/users/{user_id}/apps/{app_id}"
+    };
+  }
+
+  // ReadUserByEmail
+  //
+  // ReadUserByEmail returns the user with the given email.
+  rpc ReadUserByEmail (ReadUserByEmailRequest) returns (ReadUserByEmailResponse) {
+    option (google.api.http) = {
+      get: "/v1/users/email/{email}/apps/{app_id}"
+    };
+  }
+  
+  // UpdateUser
+  //
+  // UpdateUser updates a user.
+  rpc UpdateUser (UpdateUserRequest) returns (UpdateUserResponse) {
+    option (google.api.http) = {
+      post: "/v1/users/{user_id}/apps/{app_id}"
+      body: "*"
+    };
+  }
+
+  // DeleteUser
+  //
+  // DeleteUser deletes a user.
+  rpc DeleteUser (DeleteUserRequest) returns (DeleteUserResponse) {
+    option (google.api.http) = {
+      delete: "/v1/users/{user_id}/apps/{app_id}"
+    };
+  }
+
+  // UpsertPrivacyPolicy
+  //
+  // UpsertPrivacyPolicy creates or updates the privacy policy of a user.
+  rpc UpsertPrivacyPolicy (UpsertPrivacyPolicyRequest) returns (UpsertPrivacyPolicyResponse) {
+    option (google.api.http) = {
+      post: "/v1/users/{user_id}/apps/{app_id}/privacy-policy"
+      body: "*"
+    };
+  }
+
+  // ReadSubscription
+  //
+  // ReadSubscription returns the subscription with the given id.
+  rpc ReadSubscription (ReadSubscriptionRequest) returns (ReadSubscriptionResponse) {
     option (google.api.http) = {
       get: "/v1/users/{user_id}/apps/{app_id}/subscription"
-    };
-  }
-
-  // UpsertUser
-  //
-  // UpsertUser creates or updates a user.
-  rpc UpsertUser (UpsertUserRequest) returns (UpsertUserResponse) {
-    option (google.api.http) = {
-      post: "/v1/users"
-      body: "*"
     };
   }
 
@@ -253,7 +439,7 @@ service PayService {
   // AddMember adds a member to a subscription.
   rpc AddMember (AddMemberRequest) returns (AddMemberResponse) {
     option (google.api.http) = {
-      post: "/v1/users/{user_id}/apps/{app_id}/subscription/members"
+      put: "/v1/users/{user_id}/apps/{app_id}/subscription/members"
       body: "*"
     };
   }
@@ -264,102 +450,6 @@ service PayService {
   rpc RemoveMember (RemoveMemberRequest) returns (RemoveMemberResponse) {
     option (google.api.http) = {
       delete: "/v1/users/{user_id}/apps/{app_id}/subscription/members/{recipient}"
-    };
-  }
-}
-
-// EventType 
-//
-// EventType represents the type of subscription that a user has purchased.
-enum EventType {
-  EVENT_TYPE_UNSPECIFIED = 0;
-  // EVENT_TYPE_PURCHASE represents a purchase event.
-  EVENT_TYPE_PURCHASE = 1;
-  // EVENT_TYPE_RENEWAL represents a renewal event.
-  EVENT_TYPE_RENEWAL = 2;
-  // EVENT_TYPE_CANCELLATION represents a cancellation event.
-  EVENT_TYPE_CANCELLATION = 3;
-  // EVENT_TYPE_EXPIRATION represents an expiration event.
-  EVENT_TYPE_EXPIRATION = 4;
-  // EVENT_TYPE_UPGRADE represents an upgrade event.
-  EVENT_TYPE_UPGRADE = 5;
-  // EVENT_TYPE_DOWNGRADE represents a downgrade event.
-  EVENT_TYPE_DOWNGRADE = 6;
-  // EVENT_TYPE_REFUND represents a refund event.
-  EVENT_TYPE_REFUND = 7;
-}
-
-// EventPayload
-//
-// EventPayload represents the payload of an event.
-message EventPayload {
-  // purchased_at is the time when the subscription was purchased or renewed. (only for purchase and renewal events)
-  optional google.protobuf.Timestamp purchased_at = 1 [(buf.validate.field).timestamp.gte.seconds = 0];
-  // expires_at is the time when the subscription expires. (only for purchase and renewal events)
-  optional google.protobuf.Timestamp expires_at = 2 [(buf.validate.field).timestamp.gte.seconds = 0];
-  // members is the number of members that the subscription has. (only for purchase events)
-  optional int32 members = 3 [(buf.validate.field).int32 = {gt: 0}];
-  // recipients is the list of emails of the recipients for the subscription. (only for purchase events)
-  repeated string recipients = 4 [(buf.validate.field).repeated.items.string.email = true];
-}
-
-// OnSubscriptionEventRequest
-//
-// OnSubscriptionEventRequest represents a request to handle a subscription event.
-message OnSubscriptionEventRequest {
-  option (buf.validate.message).cel = {
-    id: "purchase_or_renewal_event_payload",
-    message: "An event of type 1 (purchase) or 2 (renewal) must have purchased_at and expires_at fields",
-    expression:
-      // If event_type is 1 (purchase) or 2 (renewal), purchased_at and expires_at must be present.
-      "(this.event_type == 1 || this.event_type == 2) ? has(this.payload.purchased_at) && has(this.payload.expires_at): true"
-  };
-
-  option (buf.validate.message).cel = {
-    id: "purchase_event_payload",
-    message: "An event of type not 1 (purchase) must not have members and recipients fields",
-    expression:
-      // If event_type is not 1 (purchase), then members and recipients must not be present.
-      "this.event_type != 1 ? !has(this.payload.members) && !has(this.payload.recipients): true"
-  };
-
-  // user_id is the unique identifier of the user.
-  string user_id = 1 [(buf.validate.field).string = {min_len: 3, max_len: 32}];
-  // app_id is the unique identifier of the application.
-  string app_id = 2 [(buf.validate.field).string = {min_len: 3, max_len: 32}];
-  // product_id is the unique identifier of the subscription.
-  string product_id = 3 [(buf.validate.field).string = {min_len: 3, max_len: 32}];
-  // purchase_token is the token of the purchase.
-  string purchase_token = 4 [(buf.validate.field).string = {min_len: 3, max_bytes: 7168}];
-  // subscription_type is the type of the subscription.
-  SubscriptionType subscription_type = 5 [(buf.validate.field).enum = {not_in: [0]}];  
-  // provider is the provider of the subscription.
-  SubscriptionProvider provider = 6 [(buf.validate.field).enum = {not_in: [0]}];
-  // event_type is the type of the event.
-  EventType event_type = 7 [(buf.validate.field).enum = {not_in: [0]}];
-  // payload is the payload of the event.
-  EventPayload payload = 8 [(buf.validate.field) = {required: false}];
-}
-
-// OnSubscriptionEventResponse
-//
-// OnSubscriptionEventResponse represents a response to handle a subscription event.
-message OnSubscriptionEventResponse {
-  // success is the success of the operation.
-  bool success = 1;
-}
-
-// SubscriptionEventService
-//
-// SubscriptionEventService represents the service to handle subscription events.
-service SubscriptionEventService {
-  // OnSubscriptionEvent
-  //
-  // OnSubscriptionEvent handles a subscription event.
-  rpc OnSubscriptionEvent (OnSubscriptionEventRequest) returns (OnSubscriptionEventResponse) {
-    option (google.api.http) = {
-      post: "/v1/users/{user_id}/apps/{app_id}/subscription/events"
-      body: "*"
     };
   }
 }

@@ -21,29 +21,49 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	PayService_GetUser_FullMethodName         = "/store.manager.v1.PayService/GetUser"
-	PayService_GetSubscription_FullMethodName = "/store.manager.v1.PayService/GetSubscription"
-	PayService_UpsertUser_FullMethodName      = "/store.manager.v1.PayService/UpsertUser"
-	PayService_AddMember_FullMethodName       = "/store.manager.v1.PayService/AddMember"
-	PayService_RemoveMember_FullMethodName    = "/store.manager.v1.PayService/RemoveMember"
+	StoreService_CreateUser_FullMethodName          = "/store.manager.v1.StoreService/CreateUser"
+	StoreService_ReadUser_FullMethodName            = "/store.manager.v1.StoreService/ReadUser"
+	StoreService_ReadUserByEmail_FullMethodName     = "/store.manager.v1.StoreService/ReadUserByEmail"
+	StoreService_UpdateUser_FullMethodName          = "/store.manager.v1.StoreService/UpdateUser"
+	StoreService_DeleteUser_FullMethodName          = "/store.manager.v1.StoreService/DeleteUser"
+	StoreService_UpsertPrivacyPolicy_FullMethodName = "/store.manager.v1.StoreService/UpsertPrivacyPolicy"
+	StoreService_ReadSubscription_FullMethodName    = "/store.manager.v1.StoreService/ReadSubscription"
+	StoreService_AddMember_FullMethodName           = "/store.manager.v1.StoreService/AddMember"
+	StoreService_RemoveMember_FullMethodName        = "/store.manager.v1.StoreService/RemoveMember"
 )
 
-// PayServiceClient is the client API for PayService service.
+// StoreServiceClient is the client API for StoreService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type PayServiceClient interface {
-	// GetUser
+type StoreServiceClient interface {
+	// CreateUser
 	//
-	// GetUser returns the user with the given id.
-	GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetUserResponse, error)
-	// GetSubscription
+	// CreateUser creates a new user.
+	CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error)
+	// ReadUser
 	//
-	// GetSubscription returns the subscription with the given id.
-	GetSubscription(ctx context.Context, in *GetSubscriptionRequest, opts ...grpc.CallOption) (*GetSubscriptionResponse, error)
-	// UpsertUser
+	// ReadUser returns the user with the given id.
+	ReadUser(ctx context.Context, in *ReadUserRequest, opts ...grpc.CallOption) (*ReadUserResponse, error)
+	// ReadUserByEmail
 	//
-	// UpsertUser creates or updates a user.
-	UpsertUser(ctx context.Context, in *UpsertUserRequest, opts ...grpc.CallOption) (*UpsertUserResponse, error)
+	// ReadUserByEmail returns the user with the given email.
+	ReadUserByEmail(ctx context.Context, in *ReadUserByEmailRequest, opts ...grpc.CallOption) (*ReadUserByEmailResponse, error)
+	// UpdateUser
+	//
+	// UpdateUser updates a user.
+	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UpdateUserResponse, error)
+	// DeleteUser
+	//
+	// DeleteUser deletes a user.
+	DeleteUser(ctx context.Context, in *DeleteUserRequest, opts ...grpc.CallOption) (*DeleteUserResponse, error)
+	// UpsertPrivacyPolicy
+	//
+	// UpsertPrivacyPolicy creates or updates the privacy policy of a user.
+	UpsertPrivacyPolicy(ctx context.Context, in *UpsertPrivacyPolicyRequest, opts ...grpc.CallOption) (*UpsertPrivacyPolicyResponse, error)
+	// ReadSubscription
+	//
+	// ReadSubscription returns the subscription with the given id.
+	ReadSubscription(ctx context.Context, in *ReadSubscriptionRequest, opts ...grpc.CallOption) (*ReadSubscriptionResponse, error)
 	// AddMember
 	//
 	// AddMember adds a member to a subscription.
@@ -54,75 +74,127 @@ type PayServiceClient interface {
 	RemoveMember(ctx context.Context, in *RemoveMemberRequest, opts ...grpc.CallOption) (*RemoveMemberResponse, error)
 }
 
-type payServiceClient struct {
+type storeServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewPayServiceClient(cc grpc.ClientConnInterface) PayServiceClient {
-	return &payServiceClient{cc}
+func NewStoreServiceClient(cc grpc.ClientConnInterface) StoreServiceClient {
+	return &storeServiceClient{cc}
 }
 
-func (c *payServiceClient) GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetUserResponse, error) {
-	out := new(GetUserResponse)
-	err := c.cc.Invoke(ctx, PayService_GetUser_FullMethodName, in, out, opts...)
+func (c *storeServiceClient) CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error) {
+	out := new(CreateUserResponse)
+	err := c.cc.Invoke(ctx, StoreService_CreateUser_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *payServiceClient) GetSubscription(ctx context.Context, in *GetSubscriptionRequest, opts ...grpc.CallOption) (*GetSubscriptionResponse, error) {
-	out := new(GetSubscriptionResponse)
-	err := c.cc.Invoke(ctx, PayService_GetSubscription_FullMethodName, in, out, opts...)
+func (c *storeServiceClient) ReadUser(ctx context.Context, in *ReadUserRequest, opts ...grpc.CallOption) (*ReadUserResponse, error) {
+	out := new(ReadUserResponse)
+	err := c.cc.Invoke(ctx, StoreService_ReadUser_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *payServiceClient) UpsertUser(ctx context.Context, in *UpsertUserRequest, opts ...grpc.CallOption) (*UpsertUserResponse, error) {
-	out := new(UpsertUserResponse)
-	err := c.cc.Invoke(ctx, PayService_UpsertUser_FullMethodName, in, out, opts...)
+func (c *storeServiceClient) ReadUserByEmail(ctx context.Context, in *ReadUserByEmailRequest, opts ...grpc.CallOption) (*ReadUserByEmailResponse, error) {
+	out := new(ReadUserByEmailResponse)
+	err := c.cc.Invoke(ctx, StoreService_ReadUserByEmail_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *payServiceClient) AddMember(ctx context.Context, in *AddMemberRequest, opts ...grpc.CallOption) (*AddMemberResponse, error) {
+func (c *storeServiceClient) UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UpdateUserResponse, error) {
+	out := new(UpdateUserResponse)
+	err := c.cc.Invoke(ctx, StoreService_UpdateUser_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *storeServiceClient) DeleteUser(ctx context.Context, in *DeleteUserRequest, opts ...grpc.CallOption) (*DeleteUserResponse, error) {
+	out := new(DeleteUserResponse)
+	err := c.cc.Invoke(ctx, StoreService_DeleteUser_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *storeServiceClient) UpsertPrivacyPolicy(ctx context.Context, in *UpsertPrivacyPolicyRequest, opts ...grpc.CallOption) (*UpsertPrivacyPolicyResponse, error) {
+	out := new(UpsertPrivacyPolicyResponse)
+	err := c.cc.Invoke(ctx, StoreService_UpsertPrivacyPolicy_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *storeServiceClient) ReadSubscription(ctx context.Context, in *ReadSubscriptionRequest, opts ...grpc.CallOption) (*ReadSubscriptionResponse, error) {
+	out := new(ReadSubscriptionResponse)
+	err := c.cc.Invoke(ctx, StoreService_ReadSubscription_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *storeServiceClient) AddMember(ctx context.Context, in *AddMemberRequest, opts ...grpc.CallOption) (*AddMemberResponse, error) {
 	out := new(AddMemberResponse)
-	err := c.cc.Invoke(ctx, PayService_AddMember_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, StoreService_AddMember_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *payServiceClient) RemoveMember(ctx context.Context, in *RemoveMemberRequest, opts ...grpc.CallOption) (*RemoveMemberResponse, error) {
+func (c *storeServiceClient) RemoveMember(ctx context.Context, in *RemoveMemberRequest, opts ...grpc.CallOption) (*RemoveMemberResponse, error) {
 	out := new(RemoveMemberResponse)
-	err := c.cc.Invoke(ctx, PayService_RemoveMember_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, StoreService_RemoveMember_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// PayServiceServer is the server API for PayService service.
-// All implementations must embed UnimplementedPayServiceServer
+// StoreServiceServer is the server API for StoreService service.
+// All implementations must embed UnimplementedStoreServiceServer
 // for forward compatibility
-type PayServiceServer interface {
-	// GetUser
+type StoreServiceServer interface {
+	// CreateUser
 	//
-	// GetUser returns the user with the given id.
-	GetUser(context.Context, *GetUserRequest) (*GetUserResponse, error)
-	// GetSubscription
+	// CreateUser creates a new user.
+	CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error)
+	// ReadUser
 	//
-	// GetSubscription returns the subscription with the given id.
-	GetSubscription(context.Context, *GetSubscriptionRequest) (*GetSubscriptionResponse, error)
-	// UpsertUser
+	// ReadUser returns the user with the given id.
+	ReadUser(context.Context, *ReadUserRequest) (*ReadUserResponse, error)
+	// ReadUserByEmail
 	//
-	// UpsertUser creates or updates a user.
-	UpsertUser(context.Context, *UpsertUserRequest) (*UpsertUserResponse, error)
+	// ReadUserByEmail returns the user with the given email.
+	ReadUserByEmail(context.Context, *ReadUserByEmailRequest) (*ReadUserByEmailResponse, error)
+	// UpdateUser
+	//
+	// UpdateUser updates a user.
+	UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserResponse, error)
+	// DeleteUser
+	//
+	// DeleteUser deletes a user.
+	DeleteUser(context.Context, *DeleteUserRequest) (*DeleteUserResponse, error)
+	// UpsertPrivacyPolicy
+	//
+	// UpsertPrivacyPolicy creates or updates the privacy policy of a user.
+	UpsertPrivacyPolicy(context.Context, *UpsertPrivacyPolicyRequest) (*UpsertPrivacyPolicyResponse, error)
+	// ReadSubscription
+	//
+	// ReadSubscription returns the subscription with the given id.
+	ReadSubscription(context.Context, *ReadSubscriptionRequest) (*ReadSubscriptionResponse, error)
 	// AddMember
 	//
 	// AddMember adds a member to a subscription.
@@ -131,254 +203,257 @@ type PayServiceServer interface {
 	//
 	// RemoveMember removes a member from a subscription.
 	RemoveMember(context.Context, *RemoveMemberRequest) (*RemoveMemberResponse, error)
-	mustEmbedUnimplementedPayServiceServer()
+	mustEmbedUnimplementedStoreServiceServer()
 }
 
-// UnimplementedPayServiceServer must be embedded to have forward compatible implementations.
-type UnimplementedPayServiceServer struct {
+// UnimplementedStoreServiceServer must be embedded to have forward compatible implementations.
+type UnimplementedStoreServiceServer struct {
 }
 
-func (UnimplementedPayServiceServer) GetUser(context.Context, *GetUserRequest) (*GetUserResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetUser not implemented")
+func (UnimplementedStoreServiceServer) CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateUser not implemented")
 }
-func (UnimplementedPayServiceServer) GetSubscription(context.Context, *GetSubscriptionRequest) (*GetSubscriptionResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetSubscription not implemented")
+func (UnimplementedStoreServiceServer) ReadUser(context.Context, *ReadUserRequest) (*ReadUserResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReadUser not implemented")
 }
-func (UnimplementedPayServiceServer) UpsertUser(context.Context, *UpsertUserRequest) (*UpsertUserResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpsertUser not implemented")
+func (UnimplementedStoreServiceServer) ReadUserByEmail(context.Context, *ReadUserByEmailRequest) (*ReadUserByEmailResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReadUserByEmail not implemented")
 }
-func (UnimplementedPayServiceServer) AddMember(context.Context, *AddMemberRequest) (*AddMemberResponse, error) {
+func (UnimplementedStoreServiceServer) UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateUser not implemented")
+}
+func (UnimplementedStoreServiceServer) DeleteUser(context.Context, *DeleteUserRequest) (*DeleteUserResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteUser not implemented")
+}
+func (UnimplementedStoreServiceServer) UpsertPrivacyPolicy(context.Context, *UpsertPrivacyPolicyRequest) (*UpsertPrivacyPolicyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpsertPrivacyPolicy not implemented")
+}
+func (UnimplementedStoreServiceServer) ReadSubscription(context.Context, *ReadSubscriptionRequest) (*ReadSubscriptionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReadSubscription not implemented")
+}
+func (UnimplementedStoreServiceServer) AddMember(context.Context, *AddMemberRequest) (*AddMemberResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddMember not implemented")
 }
-func (UnimplementedPayServiceServer) RemoveMember(context.Context, *RemoveMemberRequest) (*RemoveMemberResponse, error) {
+func (UnimplementedStoreServiceServer) RemoveMember(context.Context, *RemoveMemberRequest) (*RemoveMemberResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RemoveMember not implemented")
 }
-func (UnimplementedPayServiceServer) mustEmbedUnimplementedPayServiceServer() {}
+func (UnimplementedStoreServiceServer) mustEmbedUnimplementedStoreServiceServer() {}
 
-// UnsafePayServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to PayServiceServer will
+// UnsafeStoreServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to StoreServiceServer will
 // result in compilation errors.
-type UnsafePayServiceServer interface {
-	mustEmbedUnimplementedPayServiceServer()
+type UnsafeStoreServiceServer interface {
+	mustEmbedUnimplementedStoreServiceServer()
 }
 
-func RegisterPayServiceServer(s grpc.ServiceRegistrar, srv PayServiceServer) {
-	s.RegisterService(&PayService_ServiceDesc, srv)
+func RegisterStoreServiceServer(s grpc.ServiceRegistrar, srv StoreServiceServer) {
+	s.RegisterService(&StoreService_ServiceDesc, srv)
 }
 
-func _PayService_GetUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetUserRequest)
+func _StoreService_CreateUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateUserRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PayServiceServer).GetUser(ctx, in)
+		return srv.(StoreServiceServer).CreateUser(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: PayService_GetUser_FullMethodName,
+		FullMethod: StoreService_CreateUser_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PayServiceServer).GetUser(ctx, req.(*GetUserRequest))
+		return srv.(StoreServiceServer).CreateUser(ctx, req.(*CreateUserRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _PayService_GetSubscription_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetSubscriptionRequest)
+func _StoreService_ReadUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReadUserRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PayServiceServer).GetSubscription(ctx, in)
+		return srv.(StoreServiceServer).ReadUser(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: PayService_GetSubscription_FullMethodName,
+		FullMethod: StoreService_ReadUser_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PayServiceServer).GetSubscription(ctx, req.(*GetSubscriptionRequest))
+		return srv.(StoreServiceServer).ReadUser(ctx, req.(*ReadUserRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _PayService_UpsertUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpsertUserRequest)
+func _StoreService_ReadUserByEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReadUserByEmailRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PayServiceServer).UpsertUser(ctx, in)
+		return srv.(StoreServiceServer).ReadUserByEmail(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: PayService_UpsertUser_FullMethodName,
+		FullMethod: StoreService_ReadUserByEmail_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PayServiceServer).UpsertUser(ctx, req.(*UpsertUserRequest))
+		return srv.(StoreServiceServer).ReadUserByEmail(ctx, req.(*ReadUserByEmailRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _PayService_AddMember_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _StoreService_UpdateUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StoreServiceServer).UpdateUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: StoreService_UpdateUser_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StoreServiceServer).UpdateUser(ctx, req.(*UpdateUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _StoreService_DeleteUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StoreServiceServer).DeleteUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: StoreService_DeleteUser_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StoreServiceServer).DeleteUser(ctx, req.(*DeleteUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _StoreService_UpsertPrivacyPolicy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpsertPrivacyPolicyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StoreServiceServer).UpsertPrivacyPolicy(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: StoreService_UpsertPrivacyPolicy_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StoreServiceServer).UpsertPrivacyPolicy(ctx, req.(*UpsertPrivacyPolicyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _StoreService_ReadSubscription_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReadSubscriptionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StoreServiceServer).ReadSubscription(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: StoreService_ReadSubscription_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StoreServiceServer).ReadSubscription(ctx, req.(*ReadSubscriptionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _StoreService_AddMember_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(AddMemberRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PayServiceServer).AddMember(ctx, in)
+		return srv.(StoreServiceServer).AddMember(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: PayService_AddMember_FullMethodName,
+		FullMethod: StoreService_AddMember_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PayServiceServer).AddMember(ctx, req.(*AddMemberRequest))
+		return srv.(StoreServiceServer).AddMember(ctx, req.(*AddMemberRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _PayService_RemoveMember_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _StoreService_RemoveMember_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(RemoveMemberRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PayServiceServer).RemoveMember(ctx, in)
+		return srv.(StoreServiceServer).RemoveMember(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: PayService_RemoveMember_FullMethodName,
+		FullMethod: StoreService_RemoveMember_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PayServiceServer).RemoveMember(ctx, req.(*RemoveMemberRequest))
+		return srv.(StoreServiceServer).RemoveMember(ctx, req.(*RemoveMemberRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// PayService_ServiceDesc is the grpc.ServiceDesc for PayService service.
+// StoreService_ServiceDesc is the grpc.ServiceDesc for StoreService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var PayService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "store.manager.v1.PayService",
-	HandlerType: (*PayServiceServer)(nil),
+var StoreService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "store.manager.v1.StoreService",
+	HandlerType: (*StoreServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "GetUser",
-			Handler:    _PayService_GetUser_Handler,
+			MethodName: "CreateUser",
+			Handler:    _StoreService_CreateUser_Handler,
 		},
 		{
-			MethodName: "GetSubscription",
-			Handler:    _PayService_GetSubscription_Handler,
+			MethodName: "ReadUser",
+			Handler:    _StoreService_ReadUser_Handler,
 		},
 		{
-			MethodName: "UpsertUser",
-			Handler:    _PayService_UpsertUser_Handler,
+			MethodName: "ReadUserByEmail",
+			Handler:    _StoreService_ReadUserByEmail_Handler,
+		},
+		{
+			MethodName: "UpdateUser",
+			Handler:    _StoreService_UpdateUser_Handler,
+		},
+		{
+			MethodName: "DeleteUser",
+			Handler:    _StoreService_DeleteUser_Handler,
+		},
+		{
+			MethodName: "UpsertPrivacyPolicy",
+			Handler:    _StoreService_UpsertPrivacyPolicy_Handler,
+		},
+		{
+			MethodName: "ReadSubscription",
+			Handler:    _StoreService_ReadSubscription_Handler,
 		},
 		{
 			MethodName: "AddMember",
-			Handler:    _PayService_AddMember_Handler,
+			Handler:    _StoreService_AddMember_Handler,
 		},
 		{
 			MethodName: "RemoveMember",
-			Handler:    _PayService_RemoveMember_Handler,
-		},
-	},
-	Streams:  []grpc.StreamDesc{},
-	Metadata: "api/proto/v1/store_manager.proto",
-}
-
-const (
-	SubscriptionEventService_OnSubscriptionEvent_FullMethodName = "/store.manager.v1.SubscriptionEventService/OnSubscriptionEvent"
-)
-
-// SubscriptionEventServiceClient is the client API for SubscriptionEventService service.
-//
-// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type SubscriptionEventServiceClient interface {
-	// OnSubscriptionEvent
-	//
-	// OnSubscriptionEvent handles a subscription event.
-	OnSubscriptionEvent(ctx context.Context, in *OnSubscriptionEventRequest, opts ...grpc.CallOption) (*OnSubscriptionEventResponse, error)
-}
-
-type subscriptionEventServiceClient struct {
-	cc grpc.ClientConnInterface
-}
-
-func NewSubscriptionEventServiceClient(cc grpc.ClientConnInterface) SubscriptionEventServiceClient {
-	return &subscriptionEventServiceClient{cc}
-}
-
-func (c *subscriptionEventServiceClient) OnSubscriptionEvent(ctx context.Context, in *OnSubscriptionEventRequest, opts ...grpc.CallOption) (*OnSubscriptionEventResponse, error) {
-	out := new(OnSubscriptionEventResponse)
-	err := c.cc.Invoke(ctx, SubscriptionEventService_OnSubscriptionEvent_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-// SubscriptionEventServiceServer is the server API for SubscriptionEventService service.
-// All implementations must embed UnimplementedSubscriptionEventServiceServer
-// for forward compatibility
-type SubscriptionEventServiceServer interface {
-	// OnSubscriptionEvent
-	//
-	// OnSubscriptionEvent handles a subscription event.
-	OnSubscriptionEvent(context.Context, *OnSubscriptionEventRequest) (*OnSubscriptionEventResponse, error)
-	mustEmbedUnimplementedSubscriptionEventServiceServer()
-}
-
-// UnimplementedSubscriptionEventServiceServer must be embedded to have forward compatible implementations.
-type UnimplementedSubscriptionEventServiceServer struct {
-}
-
-func (UnimplementedSubscriptionEventServiceServer) OnSubscriptionEvent(context.Context, *OnSubscriptionEventRequest) (*OnSubscriptionEventResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method OnSubscriptionEvent not implemented")
-}
-func (UnimplementedSubscriptionEventServiceServer) mustEmbedUnimplementedSubscriptionEventServiceServer() {
-}
-
-// UnsafeSubscriptionEventServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to SubscriptionEventServiceServer will
-// result in compilation errors.
-type UnsafeSubscriptionEventServiceServer interface {
-	mustEmbedUnimplementedSubscriptionEventServiceServer()
-}
-
-func RegisterSubscriptionEventServiceServer(s grpc.ServiceRegistrar, srv SubscriptionEventServiceServer) {
-	s.RegisterService(&SubscriptionEventService_ServiceDesc, srv)
-}
-
-func _SubscriptionEventService_OnSubscriptionEvent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(OnSubscriptionEventRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(SubscriptionEventServiceServer).OnSubscriptionEvent(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: SubscriptionEventService_OnSubscriptionEvent_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SubscriptionEventServiceServer).OnSubscriptionEvent(ctx, req.(*OnSubscriptionEventRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-// SubscriptionEventService_ServiceDesc is the grpc.ServiceDesc for SubscriptionEventService service.
-// It's only intended for direct use with grpc.RegisterService,
-// and not to be introspected or modified (even as a copy)
-var SubscriptionEventService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "store.manager.v1.SubscriptionEventService",
-	HandlerType: (*SubscriptionEventServiceServer)(nil),
-	Methods: []grpc.MethodDesc{
-		{
-			MethodName: "OnSubscriptionEvent",
-			Handler:    _SubscriptionEventService_OnSubscriptionEvent_Handler,
+			Handler:    _StoreService_RemoveMember_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
