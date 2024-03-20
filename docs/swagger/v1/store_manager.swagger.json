@@ -29,42 +29,7 @@
     "application/json"
   ],
   "paths": {
-    "/v1/users": {
-      "post": {
-        "summary": "UpsertUser",
-        "description": "UpsertUser creates or updates a user.",
-        "operationId": "PayService_UpsertUser",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1UpsertUserResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "description": "UpsertUserRequest represents a request to create or update a user.",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v1UpsertUserRequest"
-            }
-          }
-        ],
-        "tags": [
-          "PayService"
-        ]
-      }
-    },
-    "/v1/users/{userId}": {
+    "/v1/users/{userId}/apps/{appId}": {
       "get": {
         "summary": "GetUser",
         "description": "GetUser returns the user with the given id.",
@@ -90,6 +55,107 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "appId",
+            "description": "app_id is the unique identifier of the application.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "PayService"
+        ]
+      },
+      "post": {
+        "summary": "UpsertUser",
+        "description": "UpsertUser creates or updates a user.",
+        "operationId": "PayService_UpsertUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UpsertUserResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "userId",
+            "description": "user_id is the unique identifier of the user.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "appId",
+            "description": "app_id is the unique identifier of the application.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PayServiceUpsertUserBody"
+            }
+          }
+        ],
+        "tags": [
+          "PayService"
+        ]
+      }
+    },
+    "/v1/users/{userId}/apps/{appId}/privacy-policy": {
+      "post": {
+        "summary": "UpsertPrivacyPolicy",
+        "description": "UpsertPrivacyPolicy creates or updates the privacy policy of a user.",
+        "operationId": "PayService_UpsertPrivacyPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UpsertPrivacyPolicyResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "userId",
+            "description": "user_id is the unique identifier of the user.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "appId",
+            "description": "app_id is the unique identifier of the application.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PayServiceUpsertPrivacyPolicyBody"
+            }
           }
         ],
         "tags": [
@@ -186,7 +252,7 @@
       }
     },
     "/v1/users/{userId}/apps/{appId}/subscription/members": {
-      "post": {
+      "put": {
         "summary": "AddMember",
         "description": "AddMember adds a member to a subscription.",
         "operationId": "PayService_AddMember",
@@ -292,6 +358,44 @@
       },
       "description": "AddMemberRequest represents a request to add a member to a subscription.",
       "title": "AddMemberRequest"
+    },
+    "PayServiceUpsertPrivacyPolicyBody": {
+      "type": "object",
+      "properties": {
+        "businessCommunications": {
+          "type": "boolean",
+          "description": "business_communications is the acceptance of business communications."
+        },
+        "marketingSegmentation": {
+          "type": "boolean",
+          "description": "marketing_segmentation is the acceptance of marketing segmentation."
+        },
+        "dataTransfer": {
+          "type": "boolean",
+          "description": "data_transfer is the acceptance of data transfer."
+        }
+      },
+      "description": "UpsertPrivacyPolicyRequest represents a request to create or update the privacy policy of a user.",
+      "title": "UpsertPrivacyPolicyRequest"
+    },
+    "PayServiceUpsertUserBody": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "email is the email of the user."
+        },
+        "name": {
+          "type": "string",
+          "description": "name is the name of the user."
+        },
+        "image": {
+          "type": "string",
+          "description": "image is the image URL of the user."
+        }
+      },
+      "description": "UpsertUserRequest represents a request to create or update a user.",
+      "title": "UpsertUserRequest"
     },
     "SubscriptionEventServiceOnSubscriptionEventBody": {
       "type": "object",
@@ -441,6 +545,39 @@
       "description": "OnSubscriptionEventResponse represents a response to handle a subscription event.",
       "title": "OnSubscriptionEventResponse"
     },
+    "v1PrivacyPolicy": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "string",
+          "description": "version is the version of the privacy policy."
+        },
+        "policyDate": {
+          "type": "string",
+          "format": "date-time",
+          "description": "policy_date is the date when the privacy policy was created."
+        },
+        "acceptedDate": {
+          "type": "string",
+          "format": "date-time",
+          "description": "accepted_date is the date when the privacy policy was accepted."
+        },
+        "businessCommunications": {
+          "type": "boolean",
+          "description": "business_communications is the acceptance of business communications."
+        },
+        "marketingSegmentation": {
+          "type": "boolean",
+          "description": "marketing_segmentation is the acceptance of marketing segmentation."
+        },
+        "dataTransfer": {
+          "type": "boolean",
+          "description": "data_transfer is the acceptance of data transfer."
+        }
+      },
+      "description": "PrivacyPolicy represents a privacy policy accepted by the user.",
+      "title": "PrivacyPolicy"
+    },
     "v1ProductPayload": {
       "type": "object",
       "properties": {
@@ -549,31 +686,23 @@
       "description": "SubscriptionType represents the type of subscription that a user has purchased.\n\n - SUBSCRIPTION_TYPE_TRIAL: SUBSCRIPTION_TYPE_TRIAL represents a trial subscription.\n - SUBSCRIPTION_TYPE_PREMIUM: SUBSCRIPTION_TYPE_TRIAL represents a premium subscription.\n - SUBSCRIPTION_TYPE_MANUAL_PREMIUM: SUBSCRIPTION_TYPE_PREMIUM represents a manual premium subscription.",
       "title": "SubscriptionType"
     },
-    "v1UpsertUserRequest": {
+    "v1UpsertPrivacyPolicyResponse": {
       "type": "object",
       "properties": {
-        "email": {
-          "type": "string",
-          "description": "email is the email of the user."
-        },
-        "name": {
-          "type": "string",
-          "description": "name is the name of the user."
-        },
-        "image": {
-          "type": "string",
-          "description": "image is the image URL of the user."
+        "success": {
+          "type": "boolean",
+          "description": "success is the success of the operation."
         }
       },
-      "description": "UpsertUserRequest represents a request to create or update a user.",
-      "title": "UpsertUserRequest"
+      "description": "UpsertPrivacyPolicyResponse represents a response to create or update the privacy policy of a user.",
+      "title": "UpsertPrivacyPolicyResponse"
     },
     "v1UpsertUserResponse": {
       "type": "object",
       "properties": {
-        "user": {
-          "$ref": "#/definitions/v1User",
-          "description": "user is the user."
+        "success": {
+          "type": "boolean",
+          "description": "success is the success of the operation."
         }
       },
       "description": "UpsertUserResponse represents a response to create or update a user.",
@@ -597,6 +726,14 @@
         "image": {
           "type": "string",
           "description": "image is the image URL of the user."
+        },
+        "privacyPolicies": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1PrivacyPolicy"
+          },
+          "description": "privacy_policies is the list of privacy policies accepted by the user."
         }
       },
       "description": "User represents a user of the application.",

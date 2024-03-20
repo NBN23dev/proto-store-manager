@@ -108,6 +108,24 @@ message Subscription {
   optional ProductPayload product_payload = 9 [(buf.validate.field) = {required: false}];
 }
 
+// PrivacyPolicy
+//
+// PrivacyPolicy represents a privacy policy accepted by the user.
+message PrivacyPolicy {
+  // version is the version of the privacy policy.
+  string version = 1 [(buf.validate.field).string = {min_len: 1, max_len: 3}];
+  // policy_date is the date when the privacy policy was created.
+  google.protobuf.Timestamp policy_date = 2 [(buf.validate.field).timestamp.gte.seconds = 0];  
+  // accepted_date is the date when the privacy policy was accepted.
+  google.protobuf.Timestamp accepted_date = 3 [(buf.validate.field).timestamp.gte.seconds = 0];
+  // business_communications is the acceptance of business communications.
+  bool business_communications = 4;
+  // marketing_segmentation is the acceptance of marketing segmentation.
+  bool marketing_segmentation = 5;
+  // data_transfer is the acceptance of data transfer.
+  bool data_transfer = 6;
+}
+
 // User
 //
 // User represents a user of the application.
@@ -120,6 +138,8 @@ message User {
   optional string name = 3 [(buf.validate.field).string = {min_len: 3, max_len: 32}];
   // image is the image URL of the user.
   optional string image = 4 [(buf.validate.field).string = {min_len: 3, max_len: 32}];
+  // privacy_policies is the list of privacy policies accepted by the user.
+  repeated PrivacyPolicy privacy_policies = 5;
 }
 
 // GetUserRequest
@@ -128,6 +148,8 @@ message User {
 message GetUserRequest {
   // user_id is the unique identifier of the user.
   string user_id = 1 [(buf.validate.field).string = {min_len: 3, max_len: 32}];
+  // app_id is the unique identifier of the application.
+  string app_id = 2 [(buf.validate.field).string = {min_len: 3, max_len: 32}];  
 }
 
 // GetSubscriptionRequest
@@ -144,12 +166,32 @@ message GetSubscriptionRequest {
 //
 // UpsertUserRequest represents a request to create or update a user.
 message UpsertUserRequest {
+  // user_id is the unique identifier of the user.
+  string user_id = 1 [(buf.validate.field).string = {min_len: 3, max_len: 32}];
+  // app_id is the unique identifier of the application.
+  string app_id = 2 [(buf.validate.field).string = {min_len: 3, max_len: 32}]; 
   // email is the email of the user.
-  string email = 2 [(buf.validate.field).string.email = true];
+  string email = 3 [(buf.validate.field).string.email = true];
   // name is the name of the user.
-  optional string name = 3 [(buf.validate.field).string = {min_len: 3, max_len: 32}];
+  optional string name = 4 [(buf.validate.field).string = {min_len: 3, max_len: 32}];
   // image is the image URL of the user.
-  optional string image = 4 [(buf.validate.field).string = {min_len: 3, max_len: 32}];
+  optional string image = 5 [(buf.validate.field).string = {min_len: 3, max_len: 32}];
+}
+
+// UpsertPrivacyPolicyRequest
+//
+// UpsertPrivacyPolicyRequest represents a request to create or update the privacy policy of a user.
+message UpsertPrivacyPolicyRequest {
+  // user_id is the unique identifier of the user.
+  string user_id = 1 [(buf.validate.field).string = {min_len: 3, max_len: 32}];
+  // app_id is the unique identifier of the application.
+  string app_id = 2 [(buf.validate.field).string = {min_len: 3, max_len: 32}];
+  // business_communications is the acceptance of business communications.
+  bool business_communications = 3;
+  // marketing_segmentation is the acceptance of marketing segmentation.
+  bool marketing_segmentation = 4;
+  // data_transfer is the acceptance of data transfer.
+  bool data_transfer = 5;
 }
 
 // AddMemberRequest
@@ -188,8 +230,16 @@ message GetUserResponse {
 //
 // UpsertUserResponse represents a response to create or update a user.
 message UpsertUserResponse {
-  // user is the user.
-  User user = 1;
+  // success is the success of the operation.
+  bool success = 1;
+}
+
+// UpsertPrivacyPolicyResponse
+//
+// UpsertPrivacyPolicyResponse represents a response to create or update the privacy policy of a user.
+message UpsertPrivacyPolicyResponse {
+  // success is the success of the operation.
+  bool success = 1;
 }
 
 // GetSubscriptionResponse
@@ -225,7 +275,27 @@ service PayService {
   // GetUser returns the user with the given id.
   rpc GetUser (GetUserRequest) returns (GetUserResponse) {
     option (google.api.http) = {
-      get: "/v1/users/{user_id}"
+      get: "/v1/users/{user_id}/apps/{app_id}"
+    };
+  }
+
+  // UpsertUser
+  //
+  // UpsertUser creates or updates a user.
+  rpc UpsertUser (UpsertUserRequest) returns (UpsertUserResponse) {
+    option (google.api.http) = {
+      post: "/v1/users/{user_id}/apps/{app_id}"
+      body: "*"
+    };
+  }
+
+  // UpsertPrivacyPolicy
+  //
+  // UpsertPrivacyPolicy creates or updates the privacy policy of a user.
+  rpc UpsertPrivacyPolicy (UpsertPrivacyPolicyRequest) returns (UpsertPrivacyPolicyResponse) {
+    option (google.api.http) = {
+      post: "/v1/users/{user_id}/apps/{app_id}/privacy-policy"
+      body: "*"
     };
   }
 
@@ -238,22 +308,12 @@ service PayService {
     };
   }
 
-  // UpsertUser
-  //
-  // UpsertUser creates or updates a user.
-  rpc UpsertUser (UpsertUserRequest) returns (UpsertUserResponse) {
-    option (google.api.http) = {
-      post: "/v1/users"
-      body: "*"
-    };
-  }
-
   // AddMember
   //
   // AddMember adds a member to a subscription.
   rpc AddMember (AddMemberRequest) returns (AddMemberResponse) {
     option (google.api.http) = {
-      post: "/v1/users/{user_id}/apps/{app_id}/subscription/members"
+      put: "/v1/users/{user_id}/apps/{app_id}/subscription/members"
       body: "*"
     };
   }

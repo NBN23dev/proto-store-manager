@@ -21,11 +21,12 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	PayService_GetUser_FullMethodName         = "/store.manager.v1.PayService/GetUser"
-	PayService_GetSubscription_FullMethodName = "/store.manager.v1.PayService/GetSubscription"
-	PayService_UpsertUser_FullMethodName      = "/store.manager.v1.PayService/UpsertUser"
-	PayService_AddMember_FullMethodName       = "/store.manager.v1.PayService/AddMember"
-	PayService_RemoveMember_FullMethodName    = "/store.manager.v1.PayService/RemoveMember"
+	PayService_GetUser_FullMethodName             = "/store.manager.v1.PayService/GetUser"
+	PayService_UpsertUser_FullMethodName          = "/store.manager.v1.PayService/UpsertUser"
+	PayService_UpsertPrivacyPolicy_FullMethodName = "/store.manager.v1.PayService/UpsertPrivacyPolicy"
+	PayService_GetSubscription_FullMethodName     = "/store.manager.v1.PayService/GetSubscription"
+	PayService_AddMember_FullMethodName           = "/store.manager.v1.PayService/AddMember"
+	PayService_RemoveMember_FullMethodName        = "/store.manager.v1.PayService/RemoveMember"
 )
 
 // PayServiceClient is the client API for PayService service.
@@ -36,14 +37,18 @@ type PayServiceClient interface {
 	//
 	// GetUser returns the user with the given id.
 	GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetUserResponse, error)
-	// GetSubscription
-	//
-	// GetSubscription returns the subscription with the given id.
-	GetSubscription(ctx context.Context, in *GetSubscriptionRequest, opts ...grpc.CallOption) (*GetSubscriptionResponse, error)
 	// UpsertUser
 	//
 	// UpsertUser creates or updates a user.
 	UpsertUser(ctx context.Context, in *UpsertUserRequest, opts ...grpc.CallOption) (*UpsertUserResponse, error)
+	// UpsertPrivacyPolicy
+	//
+	// UpsertPrivacyPolicy creates or updates the privacy policy of a user.
+	UpsertPrivacyPolicy(ctx context.Context, in *UpsertPrivacyPolicyRequest, opts ...grpc.CallOption) (*UpsertPrivacyPolicyResponse, error)
+	// GetSubscription
+	//
+	// GetSubscription returns the subscription with the given id.
+	GetSubscription(ctx context.Context, in *GetSubscriptionRequest, opts ...grpc.CallOption) (*GetSubscriptionResponse, error)
 	// AddMember
 	//
 	// AddMember adds a member to a subscription.
@@ -71,18 +76,27 @@ func (c *payServiceClient) GetUser(ctx context.Context, in *GetUserRequest, opts
 	return out, nil
 }
 
-func (c *payServiceClient) GetSubscription(ctx context.Context, in *GetSubscriptionRequest, opts ...grpc.CallOption) (*GetSubscriptionResponse, error) {
-	out := new(GetSubscriptionResponse)
-	err := c.cc.Invoke(ctx, PayService_GetSubscription_FullMethodName, in, out, opts...)
+func (c *payServiceClient) UpsertUser(ctx context.Context, in *UpsertUserRequest, opts ...grpc.CallOption) (*UpsertUserResponse, error) {
+	out := new(UpsertUserResponse)
+	err := c.cc.Invoke(ctx, PayService_UpsertUser_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *payServiceClient) UpsertUser(ctx context.Context, in *UpsertUserRequest, opts ...grpc.CallOption) (*UpsertUserResponse, error) {
-	out := new(UpsertUserResponse)
-	err := c.cc.Invoke(ctx, PayService_UpsertUser_FullMethodName, in, out, opts...)
+func (c *payServiceClient) UpsertPrivacyPolicy(ctx context.Context, in *UpsertPrivacyPolicyRequest, opts ...grpc.CallOption) (*UpsertPrivacyPolicyResponse, error) {
+	out := new(UpsertPrivacyPolicyResponse)
+	err := c.cc.Invoke(ctx, PayService_UpsertPrivacyPolicy_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *payServiceClient) GetSubscription(ctx context.Context, in *GetSubscriptionRequest, opts ...grpc.CallOption) (*GetSubscriptionResponse, error) {
+	out := new(GetSubscriptionResponse)
+	err := c.cc.Invoke(ctx, PayService_GetSubscription_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -115,14 +129,18 @@ type PayServiceServer interface {
 	//
 	// GetUser returns the user with the given id.
 	GetUser(context.Context, *GetUserRequest) (*GetUserResponse, error)
-	// GetSubscription
-	//
-	// GetSubscription returns the subscription with the given id.
-	GetSubscription(context.Context, *GetSubscriptionRequest) (*GetSubscriptionResponse, error)
 	// UpsertUser
 	//
 	// UpsertUser creates or updates a user.
 	UpsertUser(context.Context, *UpsertUserRequest) (*UpsertUserResponse, error)
+	// UpsertPrivacyPolicy
+	//
+	// UpsertPrivacyPolicy creates or updates the privacy policy of a user.
+	UpsertPrivacyPolicy(context.Context, *UpsertPrivacyPolicyRequest) (*UpsertPrivacyPolicyResponse, error)
+	// GetSubscription
+	//
+	// GetSubscription returns the subscription with the given id.
+	GetSubscription(context.Context, *GetSubscriptionRequest) (*GetSubscriptionResponse, error)
 	// AddMember
 	//
 	// AddMember adds a member to a subscription.
@@ -141,11 +159,14 @@ type UnimplementedPayServiceServer struct {
 func (UnimplementedPayServiceServer) GetUser(context.Context, *GetUserRequest) (*GetUserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUser not implemented")
 }
-func (UnimplementedPayServiceServer) GetSubscription(context.Context, *GetSubscriptionRequest) (*GetSubscriptionResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetSubscription not implemented")
-}
 func (UnimplementedPayServiceServer) UpsertUser(context.Context, *UpsertUserRequest) (*UpsertUserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpsertUser not implemented")
+}
+func (UnimplementedPayServiceServer) UpsertPrivacyPolicy(context.Context, *UpsertPrivacyPolicyRequest) (*UpsertPrivacyPolicyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpsertPrivacyPolicy not implemented")
+}
+func (UnimplementedPayServiceServer) GetSubscription(context.Context, *GetSubscriptionRequest) (*GetSubscriptionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetSubscription not implemented")
 }
 func (UnimplementedPayServiceServer) AddMember(context.Context, *AddMemberRequest) (*AddMemberResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddMember not implemented")
@@ -184,24 +205,6 @@ func _PayService_GetUser_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
-func _PayService_GetSubscription_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetSubscriptionRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PayServiceServer).GetSubscription(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: PayService_GetSubscription_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PayServiceServer).GetSubscription(ctx, req.(*GetSubscriptionRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _PayService_UpsertUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpsertUserRequest)
 	if err := dec(in); err != nil {
@@ -216,6 +219,42 @@ func _PayService_UpsertUser_Handler(srv interface{}, ctx context.Context, dec fu
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(PayServiceServer).UpsertUser(ctx, req.(*UpsertUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PayService_UpsertPrivacyPolicy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpsertPrivacyPolicyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PayServiceServer).UpsertPrivacyPolicy(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PayService_UpsertPrivacyPolicy_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PayServiceServer).UpsertPrivacyPolicy(ctx, req.(*UpsertPrivacyPolicyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PayService_GetSubscription_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetSubscriptionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PayServiceServer).GetSubscription(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PayService_GetSubscription_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PayServiceServer).GetSubscription(ctx, req.(*GetSubscriptionRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -268,12 +307,16 @@ var PayService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _PayService_GetUser_Handler,
 		},
 		{
-			MethodName: "GetSubscription",
-			Handler:    _PayService_GetSubscription_Handler,
-		},
-		{
 			MethodName: "UpsertUser",
 			Handler:    _PayService_UpsertUser_Handler,
+		},
+		{
+			MethodName: "UpsertPrivacyPolicy",
+			Handler:    _PayService_UpsertPrivacyPolicy_Handler,
+		},
+		{
+			MethodName: "GetSubscription",
+			Handler:    _PayService_GetSubscription_Handler,
 		},
 		{
 			MethodName: "AddMember",
